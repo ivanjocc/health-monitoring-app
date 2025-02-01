@@ -28,7 +28,7 @@ const DashboardScreen = ({ navigation }: any) => {
     const fetchUserData = async () => {
       setLoading(true);
       try {
-        const storedUser = await AsyncStorage.getItem("user"); 
+        const storedUser = await AsyncStorage.getItem("user");
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
@@ -40,15 +40,17 @@ const DashboardScreen = ({ navigation }: any) => {
         }
       } catch (error) {
         console.error("Error fetching health data:", error);
-        Alert.alert("Error", "No se pudo cargar la información. Inténtalo de nuevo más tarde.");
+        Alert.alert(
+          "Error",
+          "No se pudo cargar la información. Inténtalo de nuevo más tarde."
+        );
       } finally {
         setLoading(false);
       }
     };
-  
+
     fetchUserData();
   }, [navigation]);
-  
 
   const nextPage = () => {
     if (currentPage < Math.ceil(healthData.length / itemsPerPage)) {
@@ -62,6 +64,16 @@ const DashboardScreen = ({ navigation }: any) => {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      await AsyncStorage.removeItem("user");
+      navigation.replace("Login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+      Alert.alert("Error", "No se pudo cerrar sesión. Inténtalo de nuevo.");
+    }
+  };
+
   return (
     <View style={styles.container}>
       {loading ? (
@@ -70,6 +82,15 @@ const DashboardScreen = ({ navigation }: any) => {
         <>
           <Text style={styles.welcomeText}>Bienvenido, {user.name}!</Text>
           <Text style={styles.emailText}>Correo: {user.email}</Text>
+
+          <View style={styles.logoutContainer}>
+            <TouchableOpacity
+              onPress={handleLogout}
+              style={styles.logoutButton}
+            >
+              <Text style={styles.logoutText}>Cerrar Sesión</Text>
+            </TouchableOpacity>
+          </View>
 
           <Text style={styles.sectionTitle}>Historial de Salud</Text>
           {currentItems.length > 0 ? (
@@ -140,7 +161,9 @@ const DashboardScreen = ({ navigation }: any) => {
           )}
         </>
       ) : (
-        <Text style={styles.noDataText}>Cargando información del usuario...</Text>
+        <Text style={styles.noDataText}>
+          Cargando información del usuario...
+        </Text>
       )}
     </View>
   );
@@ -215,6 +238,23 @@ const styles = StyleSheet.create({
     color: "#999",
     textAlign: "center",
     marginTop: 16,
+  },
+  logoutContainer: {
+    alignItems: "center",
+    marginTop: 20,
+  },
+  logoutButton: {
+    backgroundColor: "#d9534f",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    width: 200,
+    marginBottom: 20,
+  },
+  logoutText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
   },
 });
 
