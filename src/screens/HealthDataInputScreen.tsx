@@ -64,6 +64,13 @@ const HealthDataInputScreen = ({ navigation }: any) => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        onPress={() => navigation.navigate("HealthChart")}
+        style={styles.chartButton}
+      >
+        <Text style={styles.chartButtonText}>Ver Gráficos</Text>
+      </TouchableOpacity>
+
       <Text style={styles.headerText}>Ingresar Datos de Salud</Text>
 
       <TextInput
@@ -139,6 +146,18 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   buttonText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  chartButton: {
+    backgroundColor: "#007bff",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  chartButtonText: {
     color: "#fff",
     fontSize: 16,
     fontWeight: "bold",

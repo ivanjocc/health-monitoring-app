@@ -6,6 +6,7 @@ import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import DashboardScreen from "../screens/DashboardScreen";
 import HealthDataInputScreen from "../screens/HealthDataInputScreen";
+import HealthChartScreen from "../screens/HealthChartScreen";
 import { TouchableOpacity, Text, Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -50,6 +51,7 @@ export default function AppNavigator({ navigation }: any) {
           })}
         />
         <Stack.Screen name="HealthDataInput" component={HealthDataInputScreen} />
+        <Stack.Screen name="HealthChart" component={HealthChartScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
