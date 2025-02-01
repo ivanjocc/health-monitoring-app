@@ -29,7 +29,9 @@ const DashboardScreen = ({ navigation }: any) => {
         setUser(parsedUser);
         let data = await fetchHealthDataByUser(parsedUser.id);
 
-        data.sort((a: any, b: any) => new Date(b.createdAt) - new Date(a.createdAt));
+        data.sort(
+          (a: any, b: any) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
         setHealthData(data);
       } else {
         Alert.alert("Error", "No se encontró información del usuario.");
@@ -76,7 +78,9 @@ const DashboardScreen = ({ navigation }: any) => {
               onPress={() => navigation.navigate("HealthDataInput")}
               style={styles.addDataButton}
             >
-              <Text style={styles.addDataButtonText}>Ingresar Nuevos Datos</Text>
+              <Text style={styles.addDataButtonText}>
+                Ingresar Nuevos Datos
+              </Text>
             </TouchableOpacity>
           </View>
 
@@ -90,13 +94,16 @@ const DashboardScreen = ({ navigation }: any) => {
             renderItem={({ item }: any) => (
               <View style={styles.card}>
                 <Text style={styles.cardText}>
-                  <Text style={styles.boldText}>Ritmo Cardíaco:</Text> {item.heartRate} bpm
+                  <Text style={styles.boldText}>Ritmo Cardíaco:</Text>{" "}
+                  {item.heartRate} bpm
                 </Text>
                 <Text style={styles.cardText}>
-                  <Text style={styles.boldText}>Presión Arterial:</Text> {item.bloodPressure}
+                  <Text style={styles.boldText}>Presión Arterial:</Text>{" "}
+                  {item.bloodPressure}
                 </Text>
                 <Text style={styles.cardText}>
-                  <Text style={styles.boldText}>Nivel de Oxígeno:</Text> {item.oxygenLevel}%
+                  <Text style={styles.boldText}>Nivel de Oxígeno:</Text>{" "}
+                  {item.oxygenLevel}%
                 </Text>
                 <Text style={styles.cardText}>
                   <Text style={styles.boldText}>Fecha:</Text>{" "}
@@ -109,19 +116,30 @@ const DashboardScreen = ({ navigation }: any) => {
                 <TouchableOpacity
                   onPress={prevPage}
                   disabled={currentPage === 1}
-                  style={[styles.pageButton, currentPage === 1 && styles.disabledButton]}
+                  style={[
+                    styles.pageButton,
+                    currentPage === 1 && styles.disabledButton,
+                  ]}
                 >
                   <Text style={styles.pageButtonText}>Anterior</Text>
                 </TouchableOpacity>
 
                 <Text style={styles.pageIndicator}>
-                  Página {currentPage} de {Math.ceil(healthData.length / itemsPerPage)}
+                  Página {currentPage} de{" "}
+                  {Math.ceil(healthData.length / itemsPerPage)}
                 </Text>
 
                 <TouchableOpacity
                   onPress={nextPage}
-                  disabled={currentPage === Math.ceil(healthData.length / itemsPerPage)}
-                  style={[styles.pageButton, currentPage === Math.ceil(healthData.length / itemsPerPage) && styles.disabledButton]}
+                  disabled={
+                    currentPage === Math.ceil(healthData.length / itemsPerPage)
+                  }
+                  style={[
+                    styles.pageButton,
+                    currentPage ===
+                      Math.ceil(healthData.length / itemsPerPage) &&
+                      styles.disabledButton,
+                  ]}
                 >
                   <Text style={styles.pageButtonText}>Siguiente</Text>
                 </TouchableOpacity>
@@ -130,7 +148,9 @@ const DashboardScreen = ({ navigation }: any) => {
           />
         </>
       ) : (
-        <Text style={styles.noDataText}>Cargando información del usuario...</Text>
+        <Text style={styles.noDataText}>
+          Cargando información del usuario...
+        </Text>
       )}
     </View>
   );
@@ -138,19 +158,60 @@ const DashboardScreen = ({ navigation }: any) => {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16, backgroundColor: "#f9f9f9" },
-  welcomeText: { fontSize: 24, fontWeight: "bold", textAlign: "center", marginBottom: 8 },
-  emailText: { fontSize: 16, textAlign: "center", marginBottom: 16, color: "#555" },
-  sectionTitle: { fontSize: 20, fontWeight: "bold", marginBottom: 16, textAlign: "center" },
-  card: { backgroundColor: "#ffffff", padding: 16, borderRadius: 8, marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 8,
+  },
+  emailText: {
+    fontSize: 16,
+    textAlign: "center",
+    marginBottom: 16,
+    color: "#555",
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    padding: 16,
+    borderRadius: 8,
+    marginBottom: 12,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
   cardText: { fontSize: 16, marginBottom: 4 },
   boldText: { fontWeight: "bold" },
-  pagination: { flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: 20 },
-  pageButton: { padding: 12, backgroundColor: "#007bff", borderRadius: 8, marginHorizontal: 10 },
+  pagination: {
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 20,
+  },
+  pageButton: {
+    padding: 12,
+    backgroundColor: "#007bff",
+    borderRadius: 8,
+    marginHorizontal: 10,
+  },
   disabledButton: { backgroundColor: "#ddd" },
   pageButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
   pageIndicator: { fontSize: 16, fontWeight: "bold", color: "#333" },
   buttonContainer: { alignItems: "center", marginBottom: 20 },
-  addDataButton: { backgroundColor: "#28a745", padding: 12, borderRadius: 8, alignItems: "center", width: 250 },
+  addDataButton: {
+    backgroundColor: "#28a745",
+    padding: 12,
+    borderRadius: 8,
+    alignItems: "center",
+    width: 250,
+  },
   addDataButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
 });
 
