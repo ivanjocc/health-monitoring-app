@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
+  TextInput,
   FlatList,
   StyleSheet,
   TouchableOpacity,
@@ -16,13 +17,13 @@ const DashboardScreen = ({ navigation }: any) => {
   const [healthData, setHealthData] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [heartRate, setHeartRate] = useState("");
+  const [bloodPressure, setBloodPressure] = useState("");
+  const [oxygenLevel, setOxygenLevel] = useState("");
+
   // Pagination
   const itemsPerPage = 3;
   const [currentPage, setCurrentPage] = useState(1);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = healthData.slice(indexOfFirstItem, indexOfLastItem);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -32,7 +33,13 @@ const DashboardScreen = ({ navigation }: any) => {
         if (storedUser) {
           const parsedUser = JSON.parse(storedUser);
           setUser(parsedUser);
-          const data = await fetchHealthDataByUser(parsedUser.id);
+          let data = await fetchHealthDataByUser(parsedUser.id);
+
+          // Ordenar datos por fecha (de más reciente a más antigua)
+          data.sort(
+            (a: any, b: any) => new Date(b.createdAt) - new Date(a.createdAt)
+          );
+
           setHealthData(data);
         } else {
           Alert.alert("Error", "No se encontró información del usuario.");
@@ -92,52 +99,52 @@ const DashboardScreen = ({ navigation }: any) => {
             </TouchableOpacity>
           </View>
 
+          {/* Health Data */}
           <Text style={styles.sectionTitle}>Historial de Salud</Text>
-          {currentItems.length > 0 ? (
-            <>
-              <FlatList
-                data={currentItems}
-                keyExtractor={(item: any) => item._id}
-                renderItem={({ item }: any) => (
-                  <View style={styles.card}>
-                    <Text style={styles.cardText}>
-                      <Text style={styles.boldText}>Ritmo Cardíaco:</Text>{" "}
-                      {item.heartRate} bpm
-                    </Text>
-                    <Text style={styles.cardText}>
-                      <Text style={styles.boldText}>Presión Arterial:</Text>{" "}
-                      {item.bloodPressure}
-                    </Text>
-                    <Text style={styles.cardText}>
-                      <Text style={styles.boldText}>Nivel de Oxígeno:</Text>{" "}
-                      {item.oxygenLevel}%
-                    </Text>
-                    <Text style={styles.cardText}>
-                      <Text style={styles.boldText}>Fecha:</Text>{" "}
-                      {new Date(item.createdAt).toLocaleString()}
-                    </Text>
-                  </View>
-                )}
-              />
+          <FlatList
+            data={healthData.slice(
+              (currentPage - 1) * itemsPerPage,
+              currentPage * itemsPerPage
+            )}
+            keyExtractor={(item: any) => item._id}
+            renderItem={({ item }: any) => (
+              <View style={styles.card}>
+                <View style={styles.cardRow}>
+                  <Text style={styles.boldText}>🫀 Ritmo Cardíaco:</Text>
+                  <Text style={styles.cardValue}>{item.heartRate} bpm</Text>
+                </View>
 
-              {/* Paginator */}
+                <View style={styles.cardRow}>
+                  <Text style={styles.boldText}>🩸 Presión Arterial:</Text>
+                  <Text style={styles.cardValue}>{item.bloodPressure}</Text>
+                </View>
+
+                <View style={styles.cardRow}>
+                  <Text style={styles.boldText}>🌬️ Nivel de Oxígeno:</Text>
+                  <Text style={styles.cardValue}>{item.oxygenLevel}%</Text>
+                </View>
+
+                <View style={styles.cardRow}>
+                  <Text style={styles.boldText}>📅 Fecha:</Text>
+                  <Text style={styles.cardValue}>
+                    {new Date(item.createdAt).toLocaleString()}
+                  </Text>
+                </View>
+              </View>
+            )}
+            ListFooterComponent={
               <View style={styles.pagination}>
                 <TouchableOpacity
                   onPress={prevPage}
                   disabled={currentPage === 1}
-                  style={[
-                    styles.pageButton,
-                    currentPage === 1 && styles.disabledButton,
-                  ]}
+                  style={[styles.pageButton, currentPage === 1 && styles.disabledButton]}
                 >
                   <Text style={styles.pageButtonText}>Anterior</Text>
                 </TouchableOpacity>
-
                 <Text style={styles.pageIndicator}>
                   Página {currentPage} de{" "}
                   {Math.ceil(healthData.length / itemsPerPage)}
                 </Text>
-
                 <TouchableOpacity
                   onPress={nextPage}
                   disabled={
@@ -145,117 +152,67 @@ const DashboardScreen = ({ navigation }: any) => {
                   }
                   style={[
                     styles.pageButton,
-                    currentPage ===
-                      Math.ceil(healthData.length / itemsPerPage) &&
+                    currentPage === Math.ceil(healthData.length / itemsPerPage) &&
                       styles.disabledButton,
                   ]}
                 >
                   <Text style={styles.pageButtonText}>Siguiente</Text>
                 </TouchableOpacity>
               </View>
-            </>
-          ) : (
-            <Text style={styles.noDataText}>
-              No hay datos clínicos disponibles.
-            </Text>
-          )}
+            }
+            contentContainerStyle={{ paddingBottom: 50 }}
+          />
         </>
       ) : (
-        <Text style={styles.noDataText}>
-          Cargando información del usuario...
-        </Text>
+        <Text style={styles.noDataText}>Cargando información del usuario...</Text>
       )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: "#f9f9f9",
+  container: { flex: 1, padding: 16, backgroundColor: "#f9f9f9" },
+  welcomeText: { fontSize: 24, fontWeight: "bold", textAlign: "center" },
+  emailText: { fontSize: 16, textAlign: "center", color: "#555", marginBottom: 16 },
+  logoutContainer: { alignItems: "center", marginBottom: 20 },
+  logoutButton: {
+    backgroundColor: "#ff4d4d",
+    padding: 15,
+    borderRadius: 8,
+    alignItems: "center",
+    width: 200,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  welcomeText: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 8,
-  },
-  emailText: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 16,
-    color: "#555",
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    textAlign: "center",
-  },
+  logoutText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  sectionTitle: { fontSize: 22, fontWeight: "bold", marginBottom: 16, textAlign: "center" },
   card: {
     backgroundColor: "#ffffff",
     padding: 16,
-    borderRadius: 8,
+    borderRadius: 12,
     marginBottom: 12,
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 2,
+    elevation: 3,
   },
-  cardText: {
-    fontSize: 16,
-    marginBottom: 4,
-  },
-  boldText: {
-    fontWeight: "bold",
-  },
-  pagination: {
+  cardRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
+    marginBottom: 6,
   },
-  pageButton: {
-    padding: 10,
-    backgroundColor: "#007bff",
-    borderRadius: 8,
-  },
-  disabledButton: {
-    backgroundColor: "#ddd",
-  },
-  pageButtonText: {
-    color: "#fff",
-    fontSize: 16,
-  },
-  pageIndicator: {
-    fontSize: 16,
-    color: "#333",
-  },
-  noDataText: {
-    fontSize: 16,
-    color: "#999",
-    textAlign: "center",
-    marginTop: 16,
-  },
-  logoutContainer: {
-    alignItems: "center",
-    marginTop: 20,
-  },
-  logoutButton: {
-    backgroundColor: "#d9534f",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    width: 200,
-    marginBottom: 20,
-  },
-  logoutText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
+  boldText: { fontSize: 16, fontWeight: "bold", color: "#333" },
+  cardValue: { fontSize: 16, color: "#007bff", fontWeight: "bold" },
+  pagination: { flexDirection: "row", justifyContent: "center", paddingBottom: 20 },
+  pageButton: { padding: 12, backgroundColor: "#007bff", borderRadius: 8, marginHorizontal: 10 },
+  disabledButton: { backgroundColor: "#ddd" },
+  pageButtonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
+  pageIndicator: { fontSize: 16, fontWeight: "bold", color: "#333" },
+  noDataText: { fontSize: 16, color: "#999", textAlign: "center", marginTop: 16 },
 });
 
 export default DashboardScreen;
